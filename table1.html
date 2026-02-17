@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Books Data Table</title>
+<style>
+
+body{
+  font-family: Arial;
+  margin: 20px;
+}
+
+input{
+  padding: 5px;
+  margin-bottom: 10px;
+  width: 250px;
+}
+
+table{
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 13px;
+}
+
+th, td{
+  border: 1px solid black;
+  padding: 8px;
+  text-align: left;        
+  vertical-align: top;    
+}
+
+th{
+  background: rgb(236, 229, 229);
+  cursor: pointer;
+  text-align: left;       
+}
+
+img{
+  width: 60px;
+  display: block;         
+}
+
+.short-desc{
+  max-width: 250px;
+  text-align: left;
+}
+
+.long-desc{
+  max-width: 300px;
+  text-align: left;
+}
+
+button{
+  padding: 6px 12px;
+  margin: 10px 5px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h2>Books Data Table</h2>
+
+Search:
+<input type="text" id="searchBox" onkeyup="searchBooks()">
+
+<table>
+  <thead>
+    <tr>
+      <th onclick="sortTable('title')">Title <span id="titleArrow"></span></th>
+      <th onclick="sortTable('isbn')">ISBN <span id="isbnArrow"></span></th>
+      <th onclick="sortTable('pageCount')">Pages <span id="pageCountArrow"></span></th>
+      <th onclick="sortTable('publishedDate')">Published <span id="publishedDateArrow"></span></th>
+      <th>Image</th>
+      <th>Short Description</th>
+      <th>Long Description</th>
+      <th onclick="sortTable('status')">Status <span id="statusArrow"></span></th>
+      <th onclick="sortTable('price')">Price <span id="priceArrow"></span></th>
+      <th onclick="sortTable('currency')">Currency <span id="currencyArrow"></span></th>
+      <th onclick="sortTable('discount')">Discount <span id="discountArrow"></span></th>
+      <th onclick="sortTable('discountUnits')">Discount Type <span id="discountUnitsArrow"></span></th>
+      <th>Authors</th>
+      <th>Categories</th>
+    </tr>
+  </thead>
+
+  <tbody id="tbody"></tbody>
+</table>
+
+<button onclick="previousPage()">Previous</button>
+<button onclick="nextPage()">Next</button>
+
+<script>
+
+var books = [];
+var filteredBooks = [];
+var currentPage = 1;
+var rowsPerPage = 10;
+
+var sortProperty = "";
+var sortDirection = "asc";
+
+fetch("books.json")
+.then(res => res.json())
+.then(data => {
+  books = data;
+  filteredBooks = books;
+  showTable();
+});
+
+function showTable(){
+
+  var tbody = document.getElementById("tbody");
+  tbody.innerHTML = "";
+
+  var start = (currentPage - 1) * rowsPerPage;
+  var end = start + rowsPerPage;
+
+  for(var i = start; i < end && i < filteredBooks.length; i++){
+
+    var b = filteredBooks[i];
+
+    var row = "<tr>";
+
+    row += "<td>"+b.title+"</td>";
+    row += "<td>"+b.isbn+"</td>";
+    row += "<td>"+b.pageCount+"</td>";
+    row += "<td>"+ new Date(b.publishedDate.$date).toLocaleDateString() +"</td>";
+     row += "<td><img src='"+b.thumbnailUrl+"'></td>";
+   row += "<td class='short-desc'>"+b.shortDescription+"</td>";
+row += "<td class='long-desc'>"+b.longDescription+"</td>";
+    row += "<td>"+b.status+"</td>";
+    row += "<td>"+b.price+"</td>";
+    row += "<td>"+b.currency+"</td>";
+    row += "<td>"+b.discount+"</td>";
+    row += "<td>"+b.discountUnits+"</td>";
+    row += "<td>"+b.authors.join(", ")+"</td>";
+    row += "<td>"+b.categories.join(", ")+"</td>";
+    row += "</tr>";
+
+    tbody.innerHTML += row;
+  }
+}
+
+function nextPage(){
+  if(currentPage * rowsPerPage < filteredBooks.length){
+    currentPage++;
+    showTable();
+  }
+}
+
+function previousPage(){
+  if(currentPage > 1){
+    currentPage--;
+    showTable();
+  }
+}
+
+function searchBooks(){
+
+  var text = document.getElementById("searchBox").value.toLowerCase();
+
+  filteredBooks = books.filter(function(book){
+
+    return (
+      book.title.toLowerCase().includes(text) ||
+      book.isbn.toLowerCase().includes(text) ||
+      book.status.toLowerCase().includes(text)
+    );
+  });
+
+  currentPage = 1;
+  showTable();
+}
+
+function searchBooks(){
+
+  var text = document.getElementById("searchBox").value.toLowerCase();
+
+  filteredBooks = books.filter(function(book){
+
+    return (
+      String(book.title).toLowerCase().includes(text) ||
+      String(book.isbn).toLowerCase().includes(text) ||
+      String(book.pageCount).toLowerCase().includes(text) ||
+      String(book.status).toLowerCase().includes(text) ||
+      String(book.price).toLowerCase().includes(text) ||
+      String(book.currency).toLowerCase().includes(text) ||
+      String(book.discount).toLowerCase().includes(text) ||
+      String(book.discountUnits).toLowerCase().includes(text) ||
+      book.authors.join(", ").toLowerCase().includes(text) ||
+      book.categories.join(", ").toLowerCase().includes(text)
+    );
+
+  });
+
+  currentPage = 1;
+  showTable();
+}
+
+function clearArrows(){
+
+  var arrows = ["title","isbn","pageCount","publishedDate",
+                "status","price","currency","discount","discountUnits"];
+
+  for(var i=0; i<arrows.length; i++){
+    document.getElementById(arrows[i]+"Arrow").innerHTML="";
+  }
+}
+
+</script>
+
+</body>
+</html>
