@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Products API Example</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: #f4f4f4;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        #products {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .card {
+            background: white;
+            width: 220px;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 5px gray;
+        }
+
+        .card img {
+            width: 100%;
+            height: 150px;
+            object-fit: contain;
+        }
+
+        .card h3 {
+            font-size: 14px;
+        }
+
+        .card p {
+            font-size: 13px;
+        }
+    </style>
+</head>
+
+<body>
+
+<h1>Products List</h1>
+
+<div id="products"></div>
+
+<script>
+    // Step 1: Create request object
+    var xhr = new XMLHttpRequest();
+
+    // Step 2: Prepare request
+    xhr.open("GET", "https://fakestoreapi.com/products?limit=401", true);
+
+    // Step 3: Listen for state changes
+    xhr.onreadystatechange = function () {
+
+        // Step 4: Check if response is complete and successful
+        if (xhr.readyState === 4 && xhr.status === 200) {
+
+            // Step 5: Convert JSON text to JavaScript object
+            var products = JSON.parse(xhr.responseText);
+
+            // Step 6: Select container
+            var container = document.getElementById("products");
+
+            // Step 7: Loop through products
+            products.forEach(function (product) {
+
+                // Create card
+                var card = document.createElement("div");
+                card.className = "card";
+
+                // Create image
+                var img = document.createElement("img");
+                img.src = product.image;
+
+                // Create title
+                var title = document.createElement("h3");
+                title.innerText = product.title;
+
+                // Create price
+                var price = document.createElement("p");
+                price.innerText = "Price: " + product.price;
+
+                // Add elements to card
+                card.appendChild(img);
+                card.appendChild(title);
+                card.appendChild(price);
+
+                // Add card to page
+                container.appendChild(card);
+            });
+        }
+    };
+
+    // Step 8: Send request
+    xhr.send();
+</script>
+
+</body>
+</html>
